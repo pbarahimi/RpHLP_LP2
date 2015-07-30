@@ -13,7 +13,7 @@ public class Main {
 	// private static double[][] fixedCharge = MyArray.read("fixedcharge.txt");
 	private static double[][] coordinates = MyArray.read("coordinates.txt");
 	private static double[][] distances = Distance.get(coordinates);	
-	private static int P = 3; // number of hubs to be located
+	private static int P = 4; // number of hubs to be located
 	private static double q = 0.95; // probability of a node being functional
 	private static int M = nVar * P; // the big M
 
@@ -84,11 +84,11 @@ public class Main {
 				for (int j = 0; j < nVar; j++) {
 					for (int k = 0; k < nVar; k++) {
 						for (int m = 0; m < nVar; m++) {
-//							double Pr = q(i, j, k, m) * Math.pow((1 - q), r);
+							double Pr = q(i, j, k, m) * Math.pow((1 - q), r);
 							double Wij = flows[i][j];
 							double Cijkm = distances[i][k] + (1 - alpha)
 									* distances[k][m] + distances[m][j];
-							double CoEf = Wij * Cijkm;
+							double CoEf = Wij * Cijkm * Pr;
 							if (CoEf != 0) {
 								out.println("+ " + CoEf + " x" + i + "_" + j
 										+ "_" + k + "_" + m + "_" + r);
@@ -266,12 +266,10 @@ public class Main {
 								out.print(" + "+ M + " x" + i + "_" + j + "_" + m + "_"
 										+ k + "_" + r);
 								for (int n=0;n<nVar;n++){
-									if (n!=k){
-										out.print(" + "+ M + " x" + i + "_" + j + "_" + k + "_"
-												+ n + "_" + (r+1));
-										out.print(" + "+ M + " x" + i + "_" + j + "_" + n + "_"
-												+ k + "_" + (r+1));
-									}
+									out.print(" + "+ M + " x" + i + "_" + j + "_" + k + "_"
+											+ n + "_" + (r+1));
+									out.print(" + "+ M + " x" + i + "_" + j + "_" + n + "_"
+											+ k + "_" + (r+1));
 								}
 							out.println(" <= " + (2*M));
 						}
@@ -279,7 +277,7 @@ public class Main {
 				}
 			}
 		}
-
+		
 		out.println("Binaries");
 
 		// Binaries

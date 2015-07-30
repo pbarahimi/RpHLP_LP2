@@ -13,7 +13,7 @@ public class Main {
 	// private static double[][] fixedCharge = MyArray.read("fixedcharge.txt");
 	private static double[][] coordinates = MyArray.read("coordinates.txt");
 	private static double[][] distances = Distance.get(coordinates);	
-	private static int P = 4; // number of hubs to be located
+	private static int P = 3; // number of hubs to be located
 	private static double q = 0.95; // probability of a node being functional
 	private static int M = nVar * P; // the big M
 

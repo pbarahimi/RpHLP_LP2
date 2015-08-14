@@ -13,9 +13,9 @@ public class Main {
 	// private static double[][] fixedCharge = MyArray.read("fixedcharge.txt");
 	private static double[][] coordinates = MyArray.read("coordinates.txt");
 	private static double[][] distances = Distance.get(coordinates);	
-	private static int P = 4; // number of hubs to be located
+	private static int P = 6; // number of hubs to be located
 	private static double q = 0.95; // probability of a node being functional
-	private static int M = nVar * P; // the big M
+	private static int M = nVar * 4; // the big M
 
 	/**
 	 * 
@@ -116,7 +116,7 @@ public class Main {
 		for (int k = 0; k < nVar; k++) {
 			out.print(" + y" + k);
 		}
-		out.println(" = " + P);
+		out.println(" = " + 4);
 
 		// Constraint 2
 			for (int i = 0; i < nVar; i++) {

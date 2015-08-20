@@ -262,7 +262,7 @@ public class Main {
 					
 					for (int k=0;k<nVar;k++){
 						for (int m=0;m<nVar;m++){
-							if (k!=i && m!=i){
+							if (k!=i && k!=j){
 								out.append(" + x" + i + "_" + k + "_" + m + "_" + j
 										+ "_" + r);
 							}
@@ -271,10 +271,10 @@ public class Main {
 					
 					for (int k=0;k<nVar;k++){
 						for (int m=0;m<nVar;m++){
-							if (k!=i && m!=i){
+							
 								out.append(" - x" + i + "_" + k + "_" + m + "_" + j
 										+ "_" + (2*r+1) );		// left child node
-							}
+							
 						}
 					}
 					out.append(" <= 0\n");
@@ -291,7 +291,7 @@ public class Main {
 					
 					for (int k=0;k<nVar;k++){
 						for (int m=0;m<nVar;m++){
-							if (k!=i && m!=j){
+							if (m!=i && m!=j){
 								out.append(" + x" + i + "_" + k + "_" + m + "_" + j
 										+ "_" + r);
 							}
@@ -300,10 +300,10 @@ public class Main {
 					
 					for (int k=0;k<nVar;k++){
 						for (int m=0;m<nVar;m++){
-							if (k!=i && m!=j){
+							
 								out.append(" - x" + i + "_" + k + "_" + m + "_" + j
 										+ "_" + (2*r+2) );		// right child node
-							}
+							
 						}
 					}
 					out.append(" <= 0\n");
@@ -321,8 +321,6 @@ public class Main {
 						
 						for (int m=0; m<nVar; m++){
 							out.append(" + x" + i + "_" + k + "_" + m + "_"
-									+ j + "_" + (2*r+1));
-							out.append(" + x" + i + "_" + m + "_" + k + "_"
 									+ j + "_" + (2*r+1));
 						}
 						for (int m=0; m<nVar; m++){
@@ -345,8 +343,6 @@ public class Main {
 						
 						for (int k=0; k<nVar; k++){
 							out.append(" + x" + i + "_" + k + "_" + m + "_"
-									+ j + "_" + (2*r+2));
-							out.append(" + x" + i + "_" + m + "_" + k + "_"
 									+ j + "_" + (2*r+2));
 						}
 						for (int k=0; k<nVar; k++){

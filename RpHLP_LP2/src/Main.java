@@ -13,9 +13,11 @@ public class Main {
 	// private static double[][] fixedCharge = MyArray.read("fixedcharge.txt");
 	private static double[][] coordinates = MyArray.read("coordinates.txt");
 	private static double[][] distances = Distance.get(coordinates);	
-	private static int P = 6; // number of hubs to be located
-	private static double q = 0.95; // probability of a node being functional
-	private static int M = nVar * 4; // the big M
+	private static int P = 3; // number of hubs to be located
+	private static double q = 0.05; // probability of a node being functional
+	private static int D = 1; 	// max number of simultaneous disruptions
+	private static int R = (int) (Math.pow(2, D+1)-2);  // Index of the last node in the full binary tree
+	private static int M = nVar * R; // the big M
 
 	/**
 	 * 
@@ -25,11 +27,21 @@ public class Main {
 	 * @param m
 	 * @return operating probability of a route
 	 */
-	public static double q(int i, int j, int k, int m) {
+	public static double Q(int i, int k, int m, int j) {
 		double result = q;
-		if (i != j) {
+		if (k!=i && j!=m)
+			result = q+q(k,m);
+		else if (m!=j)
+			result = q(i,m);
+		else if (k!=i)
+			result = q(j,k);
+		else if (i==k && j==m)
+			result = 0;
+		else 
+			System.out.println("Not include in the Q(i,k,m,j)!");
+		/*if (i != j) {
 			if (j != k && j != m && i != k && i != m && k != m) // Xijkm
-				result = Math.pow(q, 2);
+				result = 2*q;
 			else if (j == k && j == m) // Xijjj
 				result = 1;
 			else if (i == k && i == m) // Xijii
@@ -51,8 +63,15 @@ public class Main {
 			else if (j == k && i == m && k != m) // Xijji Shouldn't be selected
 													// in the solution
 				result = 1;
-		}
+		}*/
 		return result;
+	}
+	
+	/** Cikmj */
+	private static double Cijkm(int i, int k, int m, int j) {
+		double cost = distances[i][k] + (1 - alpha) * distances[k][m]
+				+ distances[m][j];
+		return cost;
 	}
 	
 	public static int beta(int i, int j, int k, int m, int r){
@@ -62,8 +81,14 @@ public class Main {
 		return output;
 	}
 
-	public static void main(String[] args) throws FileNotFoundException {
+	private static double q(int k, int m){
+		if (k==m)
+			return 0;
+		else
+			return q;		
+	}
 
+	public static void main(String[] args) throws FileNotFoundException {
 		/*
 		 * Filling in the flows matrix assymetrically
 		 */
@@ -77,28 +102,37 @@ public class Main {
 		File file = new File("D:/model.lp");
 		PrintWriter out = new PrintWriter(file);
 
-		// Objective function
+		/**
+		 *  Objective function
+		 */
 		out.println("Minimize");
-		for (int r = 0; r <= P; r++) {
+		for (int i = 0; i < nVar; i++) {
+			for (int j = i+1; j < nVar; j++) {
+				for (int k = 0; k < nVar; k++) {
+					for (int m = 0; m < nVar; m++) {
+						double coef = flows[i][j] * Cijkm(i, k, m, j) * (1 - Q(i,k,m,j));
+						out.append(" + " + coef + " x" + i + "_" + k
+										+ "_" + m + "_" + j + "_0\n");
+					}
+				}
+			}
+		}
+		
+		for (int r = 1; r <= R; r++) {
 			for (int i = 0; i < nVar; i++) {
-				for (int j = 0; j < nVar; j++) {
+				for (int j = i+1; j < nVar; j++) {
 					for (int k = 0; k < nVar; k++) {
 						for (int m = 0; m < nVar; m++) {
-							double Pr = q(i, j, k, m) * Math.pow((1 - q), r);
-							double Wij = flows[i][j];
-							double Cijkm = distances[i][k] + (1 - alpha)
-									* distances[k][m] + distances[m][j];
-							double CoEf = Wij * Cijkm * Pr;
-							if (CoEf != 0) {
-								out.println("+ " + CoEf + " x" + i + "_" + j
-										+ "_" + k + "_" + m + "_" + r);
-							}
+							double CoEf = flows[i][j] * Cijkm(i, k, m, j) * Math.pow(q, Math.floor(Math.log(r+1)/Math.log(2)));
+							out.println(" + " + CoEf + " x" + i + "_" + k
+									+ "_" + m + "_" + j + "_" + r);
 						}
 					}
 				}
 			}
 		}
 		
+		/* Fixed charged variables */
 		for (int i = 0; i < distances.length; i++) {
 			for (int j = 0; j < distances[0].length; j++) {
 				System.out.printf("%-8.2f ", distances[i][j]);
@@ -112,36 +146,42 @@ public class Main {
 		out.println();
 		out.println("Subject to");
 
-		// Constraint 1
-		for (int k = 0; k < nVar; k++) {
-			out.print(" + y" + k);
+		/**
+		 *  Constraint 2
+		 */
+		for (int i = 0; i < nVar; i++) {
+			out.print(" + y" + i);
 		}
-		out.println(" = " + 4);
+		out.println(" = " + P);
 
-		// Constraint 2
-			for (int i = 0; i < nVar; i++) {
-				for (int j = 0; j < nVar; j++) {
-					
-					for (int k = 0; k < nVar; k++) {
-						for (int m = 0; m < nVar; m++) {
+		/**
+		 *  Constraint 3
+		 */
+		for (int i = 0; i < nVar; i++) {
+			for (int j = i+1; j < nVar; j++) {
+				
+				for (int k = 0; k < nVar; k++) {
+					for (int m = 0; m < nVar; m++) {
 
-							out.print(" + x" + i + "_" + j + "_" + k + "_" + m
-									+ "_0");
-						}
+						out.print(" + x" + i + "_" + k + "_" + m + "_" + j
+								+ "_0");
 					}
-					out.println(" = 1");
 				}
+				out.println(" = 1");
 			}
+		}
 		out.println();
 
-		// Constraint 3
-		for (int r = 0; r <= P-1; r++) {
+		/**
+		 *  Constraint 4
+		 */
+		for (int r = 0; r <= R; r++) {
 			for (int i = 0; i < nVar; i++) {
-				for (int j = 0; j < nVar; j++) {
+				for (int j = i+1; j < nVar; j++) {
 					for (int k = 0; k < nVar; k++) {
 						
 						for (int m = 0; m < nVar; m++) {
-							out.print(" + x" + i + "_" + j + "_" + k + "_" + m
+							out.print(" + x" + i + "_" + k + "_" + m + "_" + j
 									+ "_" + r);
 						}
 						out.println(" - y" + k + " <= 0");
@@ -151,14 +191,16 @@ public class Main {
 		}
 		out.println();
 
-		// Constraint 4
-		for (int r = 0; r <= P-1; r++) {
+		/**
+		 *  Constraint 5
+		 */
+		for (int r = 0; r <= R; r++) {
 			for (int i = 0; i < nVar; i++) {
-				for (int j = 0; j < nVar; j++) {
+				for (int j = i+1; j < nVar; j++) {
 					for (int m = 0; m < nVar; m++) {
 						
 						for (int k = 0; k < nVar; k++) {
-							out.print(" + x" + i + "_" + j + "_" + k + "_" + m
+							out.print(" + x" + i + "_" + k + "_" + m + "_" + j
 									+ "_" + r);
 						}
 						out.println(" - y" + m + " <= 0");
@@ -168,130 +210,193 @@ public class Main {
 		}
 		out.println();
 
-		// Constraint 5
+
+		/** 
+		 * Constraint 6
+		 */
+		for (int i = 0; i < nVar; i++) {
+			for (int j = i+1; j < nVar; j++) {
+				for (int r=0;r<=R;r++){
+					
+					for (int k=0;k<nVar;k++){
+						for (int m=0;m<nVar;m++){
+							if (k!=i && m!=i){
+								out.append(" + x" + i + "_" + k + "_" + m + "_" + j
+										+ "_" + r);
+							}
+						}
+					}
+					out.append(" + " + M + " y" + i);
+					out.append(" <= " + M + "\n");
+				}
+			}
+		}
 		
+		/** 
+		 * Constraint 7
+		 */
+		for (int i = 0; i < nVar; i++) {
+			for (int j = i+1; j < nVar; j++) {
+				for (int r=0;r<=R;r++){
+					
+					for (int k=0;k<nVar;k++){
+						for (int m=0;m<nVar;m++){
+							if (k!=j && m!=j){
+								out.append(" + x" + i + "_" + k + "_" + m + "_" + j
+										+ "_" + r);
+							}
+						}
+					}
+					out.append(" + " + M + " y" + j);
+					out.append(" <= " + M + "\n");
+				}
+			}
+		}
+		
+		/**
+		 *  Constraint 8
+		 */
+		for (int i = 0; i < nVar; i++) {
+			for (int j = i+1; j < nVar; j++) {
+				for (int r=0;r<=R-Math.pow(2, D);r++){	// The leaf-nodes are not to be considered in this constraint.
+					
+					for (int k=0;k<nVar;k++){
+						for (int m=0;m<nVar;m++){
+							if (k!=i && m!=i){
+								out.append(" + x" + i + "_" + k + "_" + m + "_" + j
+										+ "_" + r);
+							}
+						}
+					}
+					
+					for (int k=0;k<nVar;k++){
+						for (int m=0;m<nVar;m++){
+							if (k!=i && m!=i){
+								out.append(" - x" + i + "_" + k + "_" + m + "_" + j
+										+ "_" + (2*r+1) );		// left child node
+							}
+						}
+					}
+					out.append(" <= 0\n");
+				}
+			}
+		}
+		
+		/**
+		 *  Constraint 9
+		 */
+		for (int i = 0; i < nVar; i++) {
+			for (int j = i+1; j < nVar; j++) {
+				for (int r=0;r<=R-Math.pow(2, D);r++){	// The leaf-nodes are not to be considered in this constraint.
+					
+					for (int k=0;k<nVar;k++){
+						for (int m=0;m<nVar;m++){
+							if (k!=i && m!=j){
+								out.append(" + x" + i + "_" + k + "_" + m + "_" + j
+										+ "_" + r);
+							}
+						}
+					}
+					
+					for (int k=0;k<nVar;k++){
+						for (int m=0;m<nVar;m++){
+							if (k!=i && m!=j){
+								out.append(" - x" + i + "_" + k + "_" + m + "_" + j
+										+ "_" + (2*r+2) );		// right child node
+							}
+						}
+					}
+					out.append(" <= 0\n");
+				}
+			}
+		}
+		
+		/**
+		 * Constraint 10
+		 */
 		for (int i=0;i<nVar;i++){
-			for (int j=0;j<nVar;j++){
+			for (int j=i+1;j<nVar;j++){
+				for (int k=0;k<nVar;k++){
+					for (int r=0;r<=R-Math.pow(2, D);r++){
+						
+						for (int m=0; m<nVar; m++){
+							out.append(" + x" + i + "_" + k + "_" + m + "_"
+									+ j + "_" + (2*r+1));
+							out.append(" + x" + i + "_" + m + "_" + k + "_"
+									+ j + "_" + (2*r+1));
+						}
+						for (int m=0; m<nVar; m++){
+							out.append(" + " + M + " x" + i + "_" + k + "_" + m + "_"
+									+ j + "_" + r);
+						}
+						out.println(" <= "+ M);
+					}
+				}
+			}
+		}
+		
+		/**
+		 * Constraint 11
+		 */
+		for (int i=0;i<nVar;i++){
+			for (int j=i+1;j<nVar;j++){
+				for (int m=0;m<nVar;m++){
+					for (int r=0;r<=R-Math.pow(2, D);r++){
+						
+						for (int k=0; k<nVar; k++){
+							out.append(" + x" + i + "_" + k + "_" + m + "_"
+									+ j + "_" + (2*r+2));
+							out.append(" + x" + i + "_" + m + "_" + k + "_"
+									+ j + "_" + (2*r+2));
+						}
+						for (int k=0; k<nVar; k++){
+							out.append(" + " + M + " x" + i + "_" + k + "_" + m + "_"
+									+ j + "_" + r);
+						}
+						out.println(" <= "+ M);
+					}
+				}
+			}
+		}
+		
+		/**
+		 *  Constraint 12
+		 */
+		/* Modify the counter for r to count child nodes only. 
+		 * Hint: refer to the formulation in #38 assignment.
+		 *
+		 */		 
+/*		for (int i=0;i<nVar;i++){
+			for (int j=i+1;j<nVar;j++){
 				for (int k=0;k<nVar;k++){
 					for (int m=0;m<nVar;m++){
-						if (m!=k){
-							for (int r=0;r<=P-1;r++){
-								out.print(" + x" + i + "_" + j + "_" + k + "_"
-											+ m + "_" + r);
-								out.print(" + x" + i + "_" + j + "_" + m + "_"
-										+ k + "_" + r);
-							}
-							out.println(" <= 1");
-						}
-					}
-				}
-			}
-		}
-
-		// Constraint 6
-		for (int i = 0; i < nVar; i++) {
-			for (int j = 0; j < nVar; j++) {
-			
-				for (int k=0;k<nVar;k++){
-					for (int m=0;m<nVar;m++){	
-						for (int r=0;r<=P-1;r++){
-							int beta=beta(i,j,k,m,r);
-							out.print(" + "+beta+" x" + i + "_" + j + "_" + k + "_"
-									+ m + "_" + r);
-						}
-					}
-				}
-				out.println(" = "+ P);
-			}
-		}
-		
-		// Constraint 7
-		for (int i = 0; i < nVar; i++) {
-			for (int j = 0; j < nVar; j++) {
-				for (int r=0;r<=P-2;r++){
-					
-					for (int k = 0; k < nVar; k++) {
-						for (int m = 0; m < nVar; m++) {
-							out.print(" + x" + i + "_" + j + "_" + k + "_"
-									+ m + "_" + (r+1));
-							out.print(" - x" + i + "_" + j + "_" + k + "_"
-									+ m + "_" + r);
-						}
-					}
-					out.println(" <= 0");
-				}
-			}
-		}
-		
-		
-		// Constraint 8
-		for (int i = 0; i < nVar; i++) {
-			for (int j = 0; j < nVar; j++) {
-				for (int k=0;k<nVar;k++){
-					for (int r=0;r<=P-2;r++){
 						
-						for (int m = 0; m < nVar; m++) {
-							for (int t = r+1; t <= P; t++) {
-								out.print(" + x" + i + "_" + j + "_" + k + "_"
-										+ m + "_" + t);
-								out.print(" + x" + i + "_" + j + "_" + m + "_"
-										+ k + "_" + t);
-							}
+						for (int r=0;r<=R;r++){
+							out.print(" + x" + i + "_" + m + "_" + k + "_"
+									+ j + "_" + r);
 						}
-						out.print(" + "+ M + " x" + i + "_" + j + "_" + k + "_"
-								+ k + "_" + r);
-						out.println(" <= " + M);
+						out.println(" <= 1");
+				
 					}
 				}
 			}
-		}
-	
-		// Constraint 9
-		for (int r = 0; r <= P-3; r++) {
-			for (int i = 0; i < nVar; i++) {
-				for (int j = 0; j < nVar; j++) {
-					for (int k = 0; k < nVar; k++) {
-						for (int m = 0; m < nVar; m++) {
-								for (int _k=0;_k<nVar;_k++){
-									for (int t=r+2;t<=P-1;t++){
-										out.print(" + x" + i + "_" + j + "_" + _k + "_"
-												+ m + "_" + t);
-										out.print(" + x" + i + "_" + j + "_" + m + "_"
-												+ _k + "_" + t);
-									}
-								}
-								
-								out.print(" + "+ M + " x" + i + "_" + j + "_" + k + "_"
-										+ m + "_" + r);
-								out.print(" + "+ M + " x" + i + "_" + j + "_" + m + "_"
-										+ k + "_" + r);
-								for (int n=0;n<nVar;n++){
-									out.print(" + "+ M + " x" + i + "_" + j + "_" + k + "_"
-											+ n + "_" + (r+1));
-									out.print(" + "+ M + " x" + i + "_" + j + "_" + n + "_"
-											+ k + "_" + (r+1));
-								}
-							out.println(" <= " + (2*M));
-						}
-					}
-				}
-			}
-		}
-		
+		}*/
 		out.println("Binaries");
 
-		// Binaries
+		/**
+		 *  Binaries
+		 */
 		for (int k = 0; k < nVar; k++) {
 			out.println("y" + k);
 		}
 		
-		for (int r = 0; r < P+1; r++) {
+		for (int r = 0; r <= R; r++) {
 			for (int i = 0; i < nVar; i++) {
-				for (int j = 0; j < nVar; j++) {
+				for (int j = i+1; j < nVar; j++) {
 					for (int k = 0; k < nVar; k++) {
 						for (int m = 0; m < nVar; m++) {
-								out.println("x" + i + "_" + j
-										+ "_" + k + "_" + m + "_" + r);
+								out.println("x" + i + "_" + k
+										+ "_" + m + "_" + j + "_" + r);
 						}
 					}
 				}
@@ -340,6 +445,7 @@ public class Main {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}		
+		System.out.println("Done!");
 
 	}
 }

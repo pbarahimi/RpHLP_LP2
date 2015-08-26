@@ -13,7 +13,7 @@ public class Main {
 	// private static double[][] fixedCharge = MyArray.read("fixedcharge.txt");
 	private static double[][] coordinates = MyArray.read("coordinates.txt");
 	private static double[][] distances = Distance.get(coordinates);	
-	private static int P = 3; // number of hubs to be located
+	private static int P = 4; // number of hubs to be located
 	private static double q = 0.05; // probability of a node being functional
 	private static int D = 1; 	// max number of simultaneous disruptions
 	private static int R = (int) (Math.pow(2, D+1)-2);  // Index of the last node in the full binary tree
@@ -322,6 +322,8 @@ public class Main {
 						for (int m=0; m<nVar; m++){
 							out.append(" + x" + i + "_" + k + "_" + m + "_"
 									+ j + "_" + (2*r+1));
+							out.append(" + x" + i + "_" + m + "_" + k + "_"
+									+ j + "_" + (2*r+1));
 						}
 						for (int m=0; m<nVar; m++){
 							out.append(" + " + M + " x" + i + "_" + k + "_" + m + "_"
@@ -343,6 +345,8 @@ public class Main {
 						
 						for (int k=0; k<nVar; k++){
 							out.append(" + x" + i + "_" + k + "_" + m + "_"
+									+ j + "_" + (2*r+2));
+							out.append(" + x" + i + "_" + m + "_" + k + "_"
 									+ j + "_" + (2*r+2));
 						}
 						for (int k=0; k<nVar; k++){

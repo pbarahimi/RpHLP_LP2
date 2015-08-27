@@ -3,8 +3,6 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.PrintWriter;
 
-
-
 public class Main {
 	private static double alpha = 0.2;
 	private static double[][] tmpFlows = MyArray.read("w.txt");
@@ -15,7 +13,7 @@ public class Main {
 	private static double[][] distances = Distance.get(coordinates);	
 	private static int P = 4; // number of hubs to be located
 	private static double q = 0.05; // probability of a node being functional
-	private static int D = 1; 	// max number of simultaneous disruptions
+	private static int D = 2; 	// max number of simultaneous disruptions
 	private static int R = (int) (Math.pow(2, D+1)-2);  // Index of the last node in the full binary tree
 	private static int M = nVar * R; // the big M
 
@@ -39,31 +37,6 @@ public class Main {
 			result = 0;
 		else 
 			System.out.println("Not include in the Q(i,k,m,j)!");
-		/*if (i != j) {
-			if (j != k && j != m && i != k && i != m && k != m) // Xijkm
-				result = 2*q;
-			else if (j == k && j == m) // Xijjj
-				result = 1;
-			else if (i == k && i == m) // Xijii
-				result = 1;
-			else if (i == k && j == m) // Xijij
-				result = 1;
-			else if (i != k && j != m && k == m) // Xijkk
-				result = q;
-			else if (i == k && m != k && j != m) // Xijik
-				result = q;
-			else if (i != k && m != k && j == m) // Xijkj
-				result = q;
-			else if (j == k && k != m && i != m) // Xijjk Shouldn't be selected
-													// in the solution
-				result = q;
-			else if (i == m && m != k && j != k) // Xijki Shouldn't be selected
-													// in the solution
-				result = q;
-			else if (j == k && i == m && k != m) // Xijji Shouldn't be selected
-													// in the solution
-				result = 1;
-		}*/
 		return result;
 	}
 	
@@ -87,7 +60,7 @@ public class Main {
 		else
 			return q;		
 	}
-
+	
 	public static void main(String[] args) throws FileNotFoundException {
 		/*
 		 * Filling in the flows matrix assymetrically
@@ -210,7 +183,6 @@ public class Main {
 		}
 		out.println();
 
-
 		/** 
 		 * Constraint 6
 		 */
@@ -302,7 +274,7 @@ public class Main {
 						for (int m=0;m<nVar;m++){
 							
 								out.append(" - x" + i + "_" + k + "_" + m + "_" + j
-										+ "_" + (2*r+2) );		// right child node
+										+ "_" + (2*r+2) );		
 							
 						}
 					}
@@ -318,12 +290,13 @@ public class Main {
 			for (int j=i+1;j<nVar;j++){
 				for (int k=0;k<nVar;k++){
 					for (int r=0;r<=R-Math.pow(2, D);r++){
-						
-						for (int m=0; m<nVar; m++){
-							out.append(" + x" + i + "_" + k + "_" + m + "_"
-									+ j + "_" + (2*r+1));
-							out.append(" + x" + i + "_" + m + "_" + k + "_"
-									+ j + "_" + (2*r+1));
+						for (int s:BinaryTree.leftChildren(r, D)){
+							for (int m=0; m<nVar; m++){
+								out.append(" + x" + i + "_" + k + "_" + m + "_"
+										+ j + "_" + s);
+								out.append(" + x" + i + "_" + m + "_" + k + "_"
+										+ j + "_" + s);
+							}
 						}
 						for (int m=0; m<nVar; m++){
 							out.append(" + " + M + " x" + i + "_" + k + "_" + m + "_"
@@ -342,45 +315,24 @@ public class Main {
 			for (int j=i+1;j<nVar;j++){
 				for (int m=0;m<nVar;m++){
 					for (int r=0;r<=R-Math.pow(2, D);r++){
-						
-						for (int k=0; k<nVar; k++){
-							out.append(" + x" + i + "_" + k + "_" + m + "_"
-									+ j + "_" + (2*r+2));
-							out.append(" + x" + i + "_" + m + "_" + k + "_"
-									+ j + "_" + (2*r+2));
-						}
-						for (int k=0; k<nVar; k++){
-							out.append(" + " + M + " x" + i + "_" + k + "_" + m + "_"
-									+ j + "_" + r);
+						for (int s:BinaryTree.rightChildren(r, D)){
+								for (int k=0; k<nVar; k++){
+									out.append(" + x" + i + "_" + k + "_" + m + "_"
+											+ j + "_" + s);
+									out.append(" + x" + i + "_" + m + "_" + k + "_"
+											+ j + "_" + s);
+								}
+							}
+							for (int k=0; k<nVar; k++){
+								out.append(" + " + M + " x" + i + "_" + k + "_" + m + "_"
+										+ j + "_" + r);
 						}
 						out.println(" <= "+ M);
 					}
 				}
 			}
 		}
-		
-		/**
-		 *  Constraint 12
-		 */
-		/* Modify the counter for r to count child nodes only. 
-		 * Hint: refer to the formulation in #38 assignment.
-		 *
-		 */		 
-/*		for (int i=0;i<nVar;i++){
-			for (int j=i+1;j<nVar;j++){
-				for (int k=0;k<nVar;k++){
-					for (int m=0;m<nVar;m++){
-						
-						for (int r=0;r<=R;r++){
-							out.print(" + x" + i + "_" + m + "_" + k + "_"
-									+ j + "_" + r);
-						}
-						out.println(" <= 1");
-				
-					}
-				}
-			}
-		}*/
+
 		out.println("Binaries");
 
 		/**
@@ -403,31 +355,6 @@ public class Main {
 			}
 		}
 		out.close();
-
-		// Test
-/*		PrintWriter out1 = new PrintWriter(new File("ModelAndResults/Test.csv"));
-		out1.append("Variable,Pr,Wij,Cijkm,Coefficient\n");
-		for (int r = 0; r < P; r++) {
-			for (int i = 0; i < nVar; i++) {
-				for (int j = 0; j < nVar; j++) {
-					for (int k = 0; k < nVar; k++) {
-						for (int m = 0; m < nVar; m++) {
-							double Pr = q(i, j, k, m) * Math.pow((1 - q), r);
-							double Wij = flows[i][j];
-							double Cijkm = distances[i][k] + (1 - alpha)
-									* distances[k][m] + distances[m][j];
-							double CoEf = Wij * Cijkm;
-							out1.append("x" + i + "_" + j + "_" + k + "_" + m
-									+ "_" + r + ",");
-							out1.append(Pr + "," + Wij + "," + Cijkm + ","
-									+ CoEf);
-							out1.append("\n");
-						}
-					}
-				}
-			}
-		}
-		out1.close();*/
 		
 		// Solve the model
 		/*ProcessBuilder pb = new ProcessBuilder("cmd", "/c", "start",

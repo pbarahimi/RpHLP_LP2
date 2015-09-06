@@ -4,22 +4,22 @@ import java.io.IOException;
 import java.io.PrintWriter;
 
 public class Main {
-	private static double alpha = 0.2;
+	//private static double alpha = 0.2;
 	private static double[][] tmpFlows = MyArray.read("w.txt");
 	private static int nVar = tmpFlows.length;
-	private static double[][] flows = new double[nVar][nVar];
+	private static double[][] flows = /*new double[nVar][nVar]*/MyArray.read("w.txt");
 	// private static double[][] fixedCharge = MyArray.read("fixedcharge.txt");
 	private static double[][] coordinates = MyArray.read("coordinates.txt");
 	private static double[][] distances = Distance.get(coordinates);	
 	//private static double[][] distances = MyArray.read("distances.txt");
-	private static int P = 4; // number of hubs to be located
+	private static int P = 5; // number of hubs to be located
 	private static double q = 0.05; // probability of a node being functional
-	private static int D = 1; 	// max number of simultaneous disruptions
+	private static int D = 0; 	// max number of simultaneous disruptions
 	private static int R = (int) (Math.pow(2, D+1)-2);  // Index of the last node in the full binary tree
 	private static int M = nVar * R; // the big M
-	//private static double collCost = 3;
-	//private static double transCost = 0.75;
-	//private static double distCost = 2;
+	private static double collCost = 3;
+	private static double transCost = 0.75;
+	private static double distCost = 2;
 	
 
 	/**
@@ -47,10 +47,10 @@ public class Main {
 	
 	/** Cikmj */
 	private static double Cijkm(int i, int k, int m, int j) {
-		double cost = distances[i][k] + (1 - alpha) * distances[k][m]
-				+ distances[m][j];
-		/*double cost = collCost * distances[i][k] + transCost * distances[k][m]
-				+ distCost * distances[m][j];*/
+		/*double cost = distances[i][k] + (1 - alpha) * distances[k][m]
+				+ distances[m][j];*/
+		double cost = collCost * distances[i][k] + transCost * distances[k][m]
+				+ distCost * distances[m][j];
 		return cost;
 	}
 	
@@ -69,15 +69,15 @@ public class Main {
 	}
 	
 	public static void main(String[] args) throws FileNotFoundException {
-		
-		 /* Filling in the flows matrix assymetrically*/
-		 
-		for (int i = 0; i < nVar; i++) {
+		/*
+		 * Filling in the flows matrix assymetrically
+		 */
+		/*for (int i = 0; i < nVar; i++) {
 			for (int j = 0; j < nVar; j++) {
 				flows[i][j] = tmpFlows[i][j] + tmpFlows[j][i];
 			}
 		}
-		
+		*/
 //		File file = new File("C:/Users/PB/git/RpHLP_LP/RpHLP_LP/ModelAndResults/model.lp");
 		File file = new File("D:/model.lp");
 		PrintWriter out = new PrintWriter(file);
@@ -87,7 +87,7 @@ public class Main {
 		 */
 		out.println("Minimize");
 		for (int i = 0; i < nVar; i++) {
-			for (int j = i+1; j < nVar; j++) {
+			for (int j = 0; j < nVar; j++) {
 				for (int k = 0; k < nVar; k++) {
 					for (int m = 0; m < nVar; m++) {
 						double coef = flows[i][j] * Cijkm(i, k, m, j) * (1 - Q(i,k,m,j));
@@ -100,7 +100,7 @@ public class Main {
 		
 		for (int r = 1; r <= R; r++) {
 			for (int i = 0; i < nVar; i++) {
-				for (int j = i+1; j < nVar; j++) {
+				for (int j = 0; j < nVar; j++) {
 					for (int k = 0; k < nVar; k++) {
 						for (int m = 0; m < nVar; m++) {
 							double CoEf = flows[i][j] * Cijkm(i, k, m, j) * Math.pow(q, Math.floor(Math.log(r+1)/Math.log(2)));
@@ -138,7 +138,7 @@ public class Main {
 		 *  Constraint 3
 		 */
 		for (int i = 0; i < nVar; i++) {
-			for (int j = i+1; j < nVar; j++) {
+			for (int j = 0; j < nVar; j++) {
 				
 				for (int k = 0; k < nVar; k++) {
 					for (int m = 0; m < nVar; m++) {
@@ -157,7 +157,7 @@ public class Main {
 		 */
 		for (int r = 0; r <= R; r++) {
 			for (int i = 0; i < nVar; i++) {
-				for (int j = i+1; j < nVar; j++) {
+				for (int j = 0; j < nVar; j++) {
 					for (int k = 0; k < nVar; k++) {
 						
 						for (int m = 0; m < nVar; m++) {
@@ -176,7 +176,7 @@ public class Main {
 		 */
 		for (int r = 0; r <= R; r++) {
 			for (int i = 0; i < nVar; i++) {
-				for (int j = i+1; j < nVar; j++) {
+				for (int j = 0; j < nVar; j++) {
 					for (int m = 0; m < nVar; m++) {
 						
 						for (int k = 0; k < nVar; k++) {
@@ -193,7 +193,7 @@ public class Main {
 		/** 
 		 * Constraint 6
 		 */
-		for (int i = 0; i < nVar; i++) {
+		/*for (int i = 0; i < nVar; i++) {
 			for (int j = i+1; j < nVar; j++) {
 				for (int r=0;r<=R;r++){
 					
@@ -209,12 +209,12 @@ public class Main {
 					out.append(" <= " + M + "\n");
 				}
 			}
-		}
+		}*/
 		
 		/** 
 		 * Constraint 7
 		 */
-		for (int i = 0; i < nVar; i++) {
+		/*for (int i = 0; i < nVar; i++) {
 			for (int j = i+1; j < nVar; j++) {
 				for (int r=0;r<=R;r++){
 					
@@ -230,14 +230,14 @@ public class Main {
 					out.append(" <= " + M + "\n");
 				}
 			}
-		}
+		}*/
 		
 		/**
 		 *  Constraint 8
 		 */
 		for (int i = 0; i < nVar; i++) {
 			for (int j = i+1; j < nVar; j++) {
-				for (int r=0;r<=Math.pow(2, D) - 2;r++){	// The leaf-nodes are not to be considered in this constraint.
+				for (int r=0;r<=R-Math.pow(2, D);r++){	// The leaf-nodes are not to be considered in this constraint.
 					
 					for (int k=0;k<nVar;k++){
 						for (int m=0;m<nVar;m++){
@@ -266,7 +266,7 @@ public class Main {
 		 */
 		for (int i = 0; i < nVar; i++) {
 			for (int j = i+1; j < nVar; j++) {
-				for (int r=0;r<=Math.pow(2, D) - 2;r++){	// The leaf-nodes are not to be considered in this constraint.
+				for (int r=0;r<=R-Math.pow(2, D);r++){	// The leaf-nodes are not to be considered in this constraint.
 					
 					for (int k=0;k<nVar;k++){
 						for (int m=0;m<nVar;m++){
@@ -296,8 +296,7 @@ public class Main {
 		for (int i=0;i<nVar;i++){
 			for (int j=i+1;j<nVar;j++){
 				for (int k=0;k<nVar;k++){
-					
-					for (int r=0;r<=Math.pow(2, D) - 2;r++){
+					for (int r=0;r<=R-Math.pow(2, D);r++){
 						for (int s:BinaryTree.leftChildren(r, D)){
 							for (int m=0; m<nVar; m++){
 								out.append(" + x" + i + "_" + k + "_" + m + "_"
@@ -322,7 +321,7 @@ public class Main {
 		for (int i=0;i<nVar;i++){
 			for (int j=i+1;j<nVar;j++){
 				for (int m=0;m<nVar;m++){
-					for (int r=0;r<=Math.pow(2, D) - 2;r++){
+					for (int r=0;r<=R-Math.pow(2, D);r++){
 						for (int s:BinaryTree.rightChildren(r, D)){
 								for (int k=0; k<nVar; k++){
 									out.append(" + x" + i + "_" + k + "_" + m + "_"

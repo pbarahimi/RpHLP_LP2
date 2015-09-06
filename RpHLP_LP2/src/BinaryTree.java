@@ -33,7 +33,7 @@ public class BinaryTree {
 		int currentNode = unvisitedList.get(0);
 		unvisitedList.remove(0);
 		
-		while (currentNode<Math.pow(2, depth) ){
+		while (currentNode<Math.pow(2, depth-1) ){
 			
 			int newLeftChild = (2*currentNode)+1;
 			int newRightChild = (2*currentNode)+2;
@@ -62,7 +62,7 @@ public class BinaryTree {
 		int currentNode = unvisitedList.get(0);
 		unvisitedList.remove(0);
 		
-		while (currentNode<Math.pow(2, depth) ){
+		while (currentNode<Math.pow(2, depth-1) ){
 			
 			int newLeftChild = (2*currentNode)+1;
 			int newRightChild = (2*currentNode)+2;

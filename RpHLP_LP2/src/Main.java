@@ -14,7 +14,7 @@ public class Main {
 	//private static double[][] distances = MyArray.read("distances.txt");
 	private static int P = 4; // number of hubs to be located
 	private static double q = 0.05; // probability of a node being functional
-	private static int D = 1; 	// max number of simultaneous disruptions
+	private static int D = 2; 	// max number of simultaneous disruptions
 	private static int R = (int) (Math.pow(2, D+1)-2);  // Index of the last node in the full binary tree
 	private static int M = nVar * R; // the big M
 	//private static double collCost = 3;
@@ -129,6 +129,7 @@ public class Main {
 		/**
 		 *  Constraint 2
 		 */
+		out.println("Constraint 2");
 		for (int i = 0; i < nVar; i++) {
 			out.print(" + y" + i);
 		}
@@ -137,6 +138,7 @@ public class Main {
 		/**
 		 *  Constraint 3
 		 */
+		out.println("Constraint 3");
 		for (int i = 0; i < nVar; i++) {
 			for (int j = i+1; j < nVar; j++) {
 				
@@ -155,6 +157,7 @@ public class Main {
 		/**
 		 *  Constraint 4
 		 */
+		out.println("Constraint 4");
 		for (int r = 0; r <= R; r++) {
 			for (int i = 0; i < nVar; i++) {
 				for (int j = i+1; j < nVar; j++) {
@@ -174,6 +177,7 @@ public class Main {
 		/**
 		 *  Constraint 5
 		 */
+		out.println("Constraint 5");
 		for (int r = 0; r <= R; r++) {
 			for (int i = 0; i < nVar; i++) {
 				for (int j = i+1; j < nVar; j++) {
@@ -193,6 +197,7 @@ public class Main {
 		/** 
 		 * Constraint 6
 		 */
+		out.println("Constraint 6");
 		for (int i = 0; i < nVar; i++) {
 			for (int j = i+1; j < nVar; j++) {
 				for (int r=0;r<=R;r++){
@@ -214,6 +219,7 @@ public class Main {
 		/** 
 		 * Constraint 7
 		 */
+		out.println("Constraint 7");
 		for (int i = 0; i < nVar; i++) {
 			for (int j = i+1; j < nVar; j++) {
 				for (int r=0;r<=R;r++){
@@ -235,6 +241,7 @@ public class Main {
 		/**
 		 *  Constraint 8
 		 */
+		out.println("Constraint 8");
 		for (int i = 0; i < nVar; i++) {
 			for (int j = i+1; j < nVar; j++) {
 				for (int r=0;r<=Math.pow(2, D) - 2;r++){	// The leaf-nodes are not to be considered in this constraint.
@@ -264,6 +271,7 @@ public class Main {
 		/**
 		 *  Constraint 9
 		 */
+		out.println("Constraint 9");
 		for (int i = 0; i < nVar; i++) {
 			for (int j = i+1; j < nVar; j++) {
 				for (int r=0;r<=Math.pow(2, D) - 2;r++){	// The leaf-nodes are not to be considered in this constraint.
@@ -293,6 +301,7 @@ public class Main {
 		/**
 		 * Constraint 10
 		 */
+		out.println("Constraint 10");
 		for (int i=0;i<nVar;i++){
 			for (int j=i+1;j<nVar;j++){
 				for (int k=0;k<nVar;k++){
@@ -319,6 +328,7 @@ public class Main {
 		/**
 		 * Constraint 11
 		 */
+		out.println("Constraint 11");
 		for (int i=0;i<nVar;i++){
 			for (int j=i+1;j<nVar;j++){
 				for (int m=0;m<nVar;m++){

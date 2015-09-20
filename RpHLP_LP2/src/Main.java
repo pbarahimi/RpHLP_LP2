@@ -129,7 +129,6 @@ public class Main {
 		/**
 		 *  Constraint 2
 		 */
-		out.println("Constraint 2");
 		for (int i = 0; i < nVar; i++) {
 			out.print(" + y" + i);
 		}
@@ -138,7 +137,6 @@ public class Main {
 		/**
 		 *  Constraint 3
 		 */
-		out.println("Constraint 3");
 		for (int i = 0; i < nVar; i++) {
 			for (int j = i+1; j < nVar; j++) {
 				
@@ -157,7 +155,6 @@ public class Main {
 		/**
 		 *  Constraint 4
 		 */
-		out.println("Constraint 4");
 		for (int r = 0; r <= R; r++) {
 			for (int i = 0; i < nVar; i++) {
 				for (int j = i+1; j < nVar; j++) {
@@ -177,7 +174,6 @@ public class Main {
 		/**
 		 *  Constraint 5
 		 */
-		out.println("Constraint 5");
 		for (int r = 0; r <= R; r++) {
 			for (int i = 0; i < nVar; i++) {
 				for (int j = i+1; j < nVar; j++) {
@@ -197,7 +193,6 @@ public class Main {
 		/** 
 		 * Constraint 6
 		 */
-		out.println("Constraint 6");
 		for (int i = 0; i < nVar; i++) {
 			for (int j = i+1; j < nVar; j++) {
 				for (int r=0;r<=R;r++){
@@ -219,7 +214,6 @@ public class Main {
 		/** 
 		 * Constraint 7
 		 */
-		out.println("Constraint 7");
 		for (int i = 0; i < nVar; i++) {
 			for (int j = i+1; j < nVar; j++) {
 				for (int r=0;r<=R;r++){
@@ -241,7 +235,6 @@ public class Main {
 		/**
 		 *  Constraint 8
 		 */
-		out.println("Constraint 8");
 		for (int i = 0; i < nVar; i++) {
 			for (int j = i+1; j < nVar; j++) {
 				for (int r=0;r<=Math.pow(2, D) - 2;r++){	// The leaf-nodes are not to be considered in this constraint.
@@ -271,7 +264,6 @@ public class Main {
 		/**
 		 *  Constraint 9
 		 */
-		out.println("Constraint 9");
 		for (int i = 0; i < nVar; i++) {
 			for (int j = i+1; j < nVar; j++) {
 				for (int r=0;r<=Math.pow(2, D) - 2;r++){	// The leaf-nodes are not to be considered in this constraint.
@@ -301,13 +293,12 @@ public class Main {
 		/**
 		 * Constraint 10
 		 */
-		out.println("Constraint 10");
 		for (int i=0;i<nVar;i++){
 			for (int j=i+1;j<nVar;j++){
 				for (int k=0;k<nVar;k++){
 					
 					for (int r=0;r<=Math.pow(2, D) - 2;r++){
-						for (int s:BinaryTree.leftChildren(r, D)){
+						for (int s:BinaryTree.getLeftChildren(r, D)){
 							for (int m=0; m<nVar; m++){
 								out.append(" + x" + i + "_" + k + "_" + m + "_"
 										+ j + "_" + s);
@@ -328,12 +319,11 @@ public class Main {
 		/**
 		 * Constraint 11
 		 */
-		out.println("Constraint 11");
 		for (int i=0;i<nVar;i++){
 			for (int j=i+1;j<nVar;j++){
 				for (int m=0;m<nVar;m++){
 					for (int r=0;r<=Math.pow(2, D) - 2;r++){
-						for (int s:BinaryTree.rightChildren(r, D)){
+						for (int s:BinaryTree.getRightChildren(r, D)){
 								for (int k=0; k<nVar; k++){
 									out.append(" + x" + i + "_" + k + "_" + m + "_"
 											+ j + "_" + s);
@@ -356,7 +346,7 @@ public class Main {
 		/**
 		 *  Binaries
 		 */
-		for (int k = 0; k < nVar; k++) {
+	/*	for (int k = 0; k < nVar; k++) {
 			out.println("y" + k);
 		}
 		
@@ -371,7 +361,8 @@ public class Main {
 					}
 				}
 			}
-		}
+		}*/
+		
 		out.close();
 		
 		// Solve the model

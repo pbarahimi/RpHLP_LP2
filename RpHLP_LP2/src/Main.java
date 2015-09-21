@@ -12,9 +12,9 @@ public class Main {
 	private static double[][] coordinates = MyArray.read("coordinates.txt");
 	private static double[][] distances = Distance.get(coordinates);	
 	//private static double[][] distances = MyArray.read("distances.txt");
-	private static int P = 4; // number of hubs to be located
+	private static int P = 2; // number of hubs to be located
 	private static double q = 0.05; // probability of a node being functional
-	private static int D = 2; 	// max number of simultaneous disruptions
+	private static int D = 1; 	// max number of simultaneous disruptions
 	private static int R = (int) (Math.pow(2, D+1)-2);  // Index of the last node in the full binary tree
 	private static int M = nVar * R; // the big M
 	//private static double collCost = 3;
@@ -67,7 +67,7 @@ public class Main {
 		else
 			return q;		
 	}
-	
+
 	public static void main(String[] args) throws FileNotFoundException {
 		
 		 /* Filling in the flows matrix assymetrically*/
@@ -129,6 +129,7 @@ public class Main {
 		/**
 		 *  Constraint 2
 		 */
+		out.println("constraint2");
 		for (int i = 0; i < nVar; i++) {
 			out.print(" + y" + i);
 		}
@@ -137,6 +138,7 @@ public class Main {
 		/**
 		 *  Constraint 3
 		 */
+		out.println("constraint3");
 		for (int i = 0; i < nVar; i++) {
 			for (int j = i+1; j < nVar; j++) {
 				
@@ -155,6 +157,7 @@ public class Main {
 		/**
 		 *  Constraint 4
 		 */
+		out.println("constraint4");
 		for (int r = 0; r <= R; r++) {
 			for (int i = 0; i < nVar; i++) {
 				for (int j = i+1; j < nVar; j++) {
@@ -174,6 +177,7 @@ public class Main {
 		/**
 		 *  Constraint 5
 		 */
+		out.println("constraint5");
 		for (int r = 0; r <= R; r++) {
 			for (int i = 0; i < nVar; i++) {
 				for (int j = i+1; j < nVar; j++) {
@@ -193,6 +197,7 @@ public class Main {
 		/** 
 		 * Constraint 6
 		 */
+		out.println("constraint6");
 		for (int i = 0; i < nVar; i++) {
 			for (int j = i+1; j < nVar; j++) {
 				for (int r=0;r<=R;r++){
@@ -214,6 +219,7 @@ public class Main {
 		/** 
 		 * Constraint 7
 		 */
+		out.println("constraint7");
 		for (int i = 0; i < nVar; i++) {
 			for (int j = i+1; j < nVar; j++) {
 				for (int r=0;r<=R;r++){
@@ -235,6 +241,7 @@ public class Main {
 		/**
 		 *  Constraint 8
 		 */
+		out.println("constraint8");
 		for (int i = 0; i < nVar; i++) {
 			for (int j = i+1; j < nVar; j++) {
 				for (int r=0;r<=Math.pow(2, D) - 2;r++){	// The leaf-nodes are not to be considered in this constraint.
@@ -264,6 +271,7 @@ public class Main {
 		/**
 		 *  Constraint 9
 		 */
+		out.println("constraint9");
 		for (int i = 0; i < nVar; i++) {
 			for (int j = i+1; j < nVar; j++) {
 				for (int r=0;r<=Math.pow(2, D) - 2;r++){	// The leaf-nodes are not to be considered in this constraint.
@@ -293,6 +301,7 @@ public class Main {
 		/**
 		 * Constraint 10
 		 */
+		out.println("constraint10");
 		for (int i=0;i<nVar;i++){
 			for (int j=i+1;j<nVar;j++){
 				for (int k=0;k<nVar;k++){
@@ -319,10 +328,12 @@ public class Main {
 		/**
 		 * Constraint 11
 		 */
+		out.println("constraint11");
 		for (int i=0;i<nVar;i++){
 			for (int j=i+1;j<nVar;j++){
 				for (int m=0;m<nVar;m++){
 					for (int r=0;r<=Math.pow(2, D) - 2;r++){
+						
 						for (int s:BinaryTree.getRightChildren(r, D)){
 								for (int k=0; k<nVar; k++){
 									out.append(" + x" + i + "_" + k + "_" + m + "_"

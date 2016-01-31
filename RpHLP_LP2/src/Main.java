@@ -81,7 +81,7 @@ public class Main {
 //		File file = new File("C:/Users/PB/git/RpHLP_LP/RpHLP_LP/ModelAndResults/model.lp");
 		File file = new File("D:/model.lp");
 		PrintWriter out = new PrintWriter(file);
-		MyArray.print(flows);
+		
 		/**
 		 *  Objective function
 		 */
@@ -129,7 +129,7 @@ public class Main {
 		/**
 		 *  Constraint 2
 		 */
-		out.println("constraint2");
+//		out.println("constraint2");
 		for (int i = 0; i < nVar; i++) {
 			out.print(" + y" + i);
 		}
@@ -138,7 +138,7 @@ public class Main {
 		/**
 		 *  Constraint 3
 		 */
-		out.println("constraint3");
+//		out.println("constraint3");
 		for (int i = 0; i < nVar; i++) {
 			for (int j = i+1; j < nVar; j++) {
 				
@@ -157,7 +157,7 @@ public class Main {
 		/**
 		 *  Constraint 4
 		 */
-		out.println("constraint4");
+//		out.println("constraint4");
 		for (int r = 0; r <= R; r++) {
 			for (int i = 0; i < nVar; i++) {
 				for (int j = i+1; j < nVar; j++) {
@@ -177,7 +177,7 @@ public class Main {
 		/**
 		 *  Constraint 5
 		 */
-		out.println("constraint5");
+//		out.println("constraint5");
 		for (int r = 0; r <= R; r++) {
 			for (int i = 0; i < nVar; i++) {
 				for (int j = i+1; j < nVar; j++) {
@@ -197,7 +197,7 @@ public class Main {
 		/** 
 		 * Constraint 6
 		 */
-		out.println("constraint6");
+//		out.println("constraint6");
 		for (int i = 0; i < nVar; i++) {
 			for (int j = i+1; j < nVar; j++) {
 				for (int r=0;r<=R;r++){
@@ -219,7 +219,7 @@ public class Main {
 		/** 
 		 * Constraint 7
 		 */
-		out.println("constraint7");
+//		out.println("constraint7");
 		for (int i = 0; i < nVar; i++) {
 			for (int j = i+1; j < nVar; j++) {
 				for (int r=0;r<=R;r++){
@@ -241,7 +241,7 @@ public class Main {
 		/**
 		 *  Constraint 8
 		 */
-		out.println("constraint8");
+//		out.println("constraint8");
 		for (int i = 0; i < nVar; i++) {
 			for (int j = i+1; j < nVar; j++) {
 				for (int r=0;r<=Math.pow(2, D) - 2;r++){	// The leaf-nodes are not to be considered in this constraint.
@@ -271,7 +271,7 @@ public class Main {
 		/**
 		 *  Constraint 9
 		 */
-		out.println("constraint9");
+//		out.println("constraint9");
 		for (int i = 0; i < nVar; i++) {
 			for (int j = i+1; j < nVar; j++) {
 				for (int r=0;r<=Math.pow(2, D) - 2;r++){	// The leaf-nodes are not to be considered in this constraint.
@@ -301,7 +301,7 @@ public class Main {
 		/**
 		 * Constraint 10
 		 */
-		out.println("constraint10");
+//		out.println("constraint10");
 		for (int i=0;i<nVar;i++){
 			for (int j=i+1;j<nVar;j++){
 				for (int k=0;k<nVar;k++){
@@ -328,7 +328,7 @@ public class Main {
 		/**
 		 * Constraint 11
 		 */
-		out.println("constraint11");
+//		out.println("constraint11");
 		for (int i=0;i<nVar;i++){
 			for (int j=i+1;j<nVar;j++){
 				for (int m=0;m<nVar;m++){
